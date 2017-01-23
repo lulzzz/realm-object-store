@@ -34,6 +34,7 @@ namespace realm {
 class SyncUser;
 class SyncSession;
 
+enum class SyncSessionStartPolicy;
 enum class SyncSessionStopPolicy;
 
 struct SyncConfig;
@@ -97,6 +98,7 @@ struct SyncError {
 struct SyncConfig {
     std::shared_ptr<SyncUser> user;
     std::string realm_url;
+    SyncSessionStartPolicy start_policy;
     SyncSessionStopPolicy stop_policy;
     std::function<SyncBindSessionHandler> bind_session_handler;
     std::function<SyncSessionErrorHandler> error_handler;

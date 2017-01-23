@@ -42,6 +42,11 @@ namespace _impl {
 struct SyncClient;
 }
 
+enum class SyncSessionStartPolicy {
+    Immediately,                      // Immediately start the session as soon as it's created.
+    Manual                            // Do not start the session automatically; the binding becomes responsible for it.
+};
+    
 enum class SyncSessionStopPolicy {
     Immediately,                    // Immediately stop the session as soon as all Realms/Sessions go out of scope.
     LiveIndefinitely,               // Never stop the session.

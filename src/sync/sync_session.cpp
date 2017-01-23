@@ -274,7 +274,7 @@ struct sync_session_states::Error : public SyncSession::State {
     void enter_state(std::unique_lock<std::mutex>&, SyncSession& session) const override
     {
         session.m_session = nullptr;
-        session.m_config = { nullptr, "", SyncSessionStopPolicy::Immediately, nullptr };
+        session.m_config = { nullptr, "", SyncSessionStartPolicy::Immediately, SyncSessionStopPolicy::Immediately, nullptr };
     }
 
     // Everything else is a no-op when in the error state.

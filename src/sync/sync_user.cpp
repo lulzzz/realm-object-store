@@ -177,11 +177,13 @@ void SyncUser::register_session(std::shared_ptr<SyncSession> session)
         case State::Active:
             // Immediately ask the session to come online.
             m_sessions[path] = session;
-            if (m_is_admin) {
-                session->bind_with_admin_token(m_refresh_token, session->config().realm_url);
-            } else {
-                lock.unlock();
-                SyncSession::revive_if_needed(std::move(session));
+            if (session->config().start_policy == SyncSessionStartPolicy::Immediately) {
+                if (m_is_admin) {
+                    session->bind_with_admin_token(m_refresh_token, session->config().realm_url);
+                } else {
+                    lock.unlock();
+                    SyncSession::revive_if_needed(std::move(session));
+                }
             }
             break;
         case State::LoggedOut:

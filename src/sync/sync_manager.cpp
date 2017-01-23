@@ -208,7 +208,7 @@ void SyncManager::reset_for_testing()
             // Callers of `SyncManager::reset_for_testing` should ensure there are no active sessions
             // prior to calling `reset_for_testing`.
             auto no_active_sessions = std::all_of(m_active_sessions.begin(), m_active_sessions.end(), [](auto& element){
-                return element.second.expired();
+                return element.second.expired() || element.second.lock()->state() == SyncSession::PublicState::Inactive;
             });
             REALM_ASSERT(no_active_sessions);
 #endif
