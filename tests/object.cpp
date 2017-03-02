@@ -52,10 +52,23 @@ struct TestContext {
         return any_cast<AnyDict>(dict).at(prop_name);
     }
 
+    util::Optional<util::Any> value_for_property(util::Any dict, const std::string &prop_name, size_t)
+    {
+        auto const& v = any_cast<AnyDict>(dict);
+        auto it = v.find(prop_name);
+        return it == v.end() ? null_value() : it->second;
+    }
+
     size_t list_size(util::Any& v) { return any_cast<AnyVec>(v).size(); }
     util::Any list_value_at_index(util::Any& v, size_t index)
     {
         return any_cast<AnyVec>(v)[index];
+    }
+
+    template<typename Func>
+    void list_enumerate(util::Any value, Func&& fn) {
+        for (auto v : any_cast<AnyVec>(value))
+            fn(v);
     }
 
     bool has_default_value_for_property(Realm*, ObjectSchema const& object, std::string const& prop)
@@ -91,7 +104,7 @@ struct TestContext {
     util::Any from_results(Results v) { return v; }
     util::Any from_object(Object v) { return v; }
 
-    bool is_null(util::Any& v) { return !v.has_value(); }
+    bool is_null(util::Any const& v) { return !v.has_value(); }
     util::Any null_value() { return {}; }
 
     size_t to_existing_object_index(SharedRealm, util::Any &)
@@ -106,6 +119,13 @@ struct TestContext {
 
         return Object::create(*this, realm, *realm->schema().find(object_type), value, update).row().get_index();
     }
+
+    util::Any deref(util::Optional<util::Any> v) { return *v; }
+
+    void will_change(Object const&, Property const&) {}
+    void did_change() {}
+    std::string print(util::Any) { return "not implemented"; }
+    bool allow_missing(util::Any) { return false; }
 };
 
 TEST_CASE("object") {
