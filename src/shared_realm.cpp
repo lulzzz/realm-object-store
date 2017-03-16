@@ -160,6 +160,17 @@ void Realm::open_with_config(const Config& config,
                 }
             };
             shared_group = std::make_unique<SharedGroup>(*history, options);
+
+            if (!config.in_memory && config.should_compact_on_launch_function) {
+                size_t free_space = -1;
+                size_t used_space = -1;
+                // getting stats requires committing a write transaction beforehand.
+                shared_group.get()->begin_write();
+                shared_group.get()->commit();
+                shared_group.get()->get_stats(free_space, used_space);
+                if (config.should_compact_on_launch_function(free_space + used_space, used_space))
+                    realm->compact();
+            }
         }
     }
     catch (realm::FileFormatUpgradeRequired const&) {
