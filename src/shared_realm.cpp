@@ -165,11 +165,13 @@ void Realm::open_with_config(const Config& config,
                 size_t free_space = -1;
                 size_t used_space = -1;
                 // getting stats requires committing a write transaction beforehand.
-                shared_group.get()->begin_write();
-                shared_group.get()->commit();
-                shared_group.get()->get_stats(free_space, used_space);
-                if (config.should_compact_on_launch_function(free_space + used_space, used_space))
-                    realm->compact();
+                Group* group = nullptr;
+                if (shared_group.get()->try_begin_write(group)) {
+                    shared_group.get()->commit();
+                    shared_group.get()->get_stats(free_space, used_space);
+                    if (config.should_compact_on_launch_function(free_space + used_space, used_space))
+                        realm->compact();
+                }
             }
         }
     }
